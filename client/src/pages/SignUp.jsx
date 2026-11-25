@@ -1,4 +1,3 @@
-import React from "react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -27,6 +26,7 @@ export const SignUp = () => {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify(formData),
       });
 
@@ -36,36 +36,36 @@ export const SignUp = () => {
         throw new Error(data.message || "Sign up failed");
       }
 
-      setLoading(false);
       navigate("/sign-in");
     } catch (err) {
       setError(err.message);
+    } finally {
       setLoading(false);
     }
   };
 
   return (
     <div className="p-3 max-w-lg mx-auto">
-      <h1 className="text-3xl text-center font-semibold my-7">SignUp</h1>
+      <h1 className="text-3xl text-center font-semibold my-7">Sign Up</h1>
       <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
         <input
           type="text"
           placeholder="username"
-          className="border p-3 rounded-lg "
+          className="border p-3 rounded-lg"
           id="username"
           onChange={handleChange}
         />
         <input
           type="email"
-          placeholder="user@53gmail.com"
-          className="border p-3 rounded-lg "
+          placeholder="you@example.com"
+          className="border p-3 rounded-lg"
           id="email"
           onChange={handleChange}
         />
         <input
           type="password"
           placeholder="password"
-          className="border p-3 rounded-lg "
+          className="border p-3 rounded-lg"
           id="password"
           onChange={handleChange}
         />
@@ -73,13 +73,13 @@ export const SignUp = () => {
           disabled={loading}
           className="bg-slate-700 text-white p-3 rounded-lg uppercase hover:opacity-95 disabled:opacity-80"
         >
-          {loading ? "Loading..." : "SignUp"}
+          {loading ? "Loading..." : "Sign Up"}
         </button>
         {error && <p className="text-red-500 mt-2">{error}</p>}
       </form>
       <div className="flex gap-3 mt-5">
-        <p>have an acount?</p>
-        <Link to={"/sign-in"}>
+        <p>Already have an account?</p>
+        <Link to="/sign-in">
           <span className="text-blue-700">Sign in</span>
         </Link>
       </div>

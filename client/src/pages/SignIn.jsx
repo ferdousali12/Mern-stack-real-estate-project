@@ -1,9 +1,10 @@
-import React from "react";
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useUser } from "../context/user-context.js";
 
 export const SignIn = () => {
   const navigate = useNavigate();
+  const { setUser } = useUser();
   const [formData, setFormData] = useState({});
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -27,19 +28,21 @@ export const SignIn = () => {
         headers: {
           "Content-Type": "application/json",
         },
+        credentials: "include",
         body: JSON.stringify(formData),
       });
 
       const data = await res.json();
 
       if (!res.ok || data.success === false) {
-        throw new Error(data.message || "Sign up failed");
+        throw new Error(data.message || "Sign in failed");
       }
 
-      setLoading(false);
-      navigate("/");
+      setUser(data);
+      navigate("/profile");
     } catch (err) {
       setError(err.message);
+    } finally {
       setLoading(false);
     }
   };
@@ -50,15 +53,15 @@ export const SignIn = () => {
       <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
         <input
           type="email"
-          placeholder="user@53gmail.com"
-          className="border p-3 rounded-lg "
+          placeholder="you@example.com"
+          className="border p-3 rounded-lg"
           id="email"
           onChange={handleChange}
         />
         <input
           type="password"
           placeholder="password"
-          className="border p-3 rounded-lg "
+          className="border p-3 rounded-lg"
           id="password"
           onChange={handleChange}
         />
@@ -71,8 +74,8 @@ export const SignIn = () => {
         {error && <p className="text-red-500 mt-2">{error}</p>}
       </form>
       <div className="flex gap-3 mt-5">
-        <p>Dont have an acount?</p>
-        <Link to={"/sign-up"}>
+        <p>Don't have an account?</p>
+        <Link to="/sign-up">
           <span className="text-blue-700">Sign Up</span>
         </Link>
       </div>
