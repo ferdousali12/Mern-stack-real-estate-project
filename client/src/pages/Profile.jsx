@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { Link } from "react-router-dom";
 import { useUser } from "../context/user-context.js";
 
 function ProfileForm({ user, onUpdate }) {
@@ -109,16 +109,9 @@ function ProfileForm({ user, onUpdate }) {
 }
 
 export const Profile = () => {
-  const { user, setUser, authLoading } = useUser();
-  const navigate = useNavigate();
+  const { user, setUser } = useUser();
 
-  useEffect(() => {
-    if (!authLoading && !user) {
-      navigate("/sign-in");
-    }
-  }, [authLoading, navigate, user]);
-
-  if (authLoading || !user) {
+  if (!user) {
     return <div className="p-3 max-w-lg mx-auto text-center">Loading...</div>;
   }
 

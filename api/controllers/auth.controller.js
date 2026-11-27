@@ -36,7 +36,11 @@ export const signup = async (req, res, next) => {
     await newUser.save();
 
     const { password: pass, ...rest } = newUser._doc;
-    res.status(201).json(rest);
+
+    res
+      .cookie("access_token", createToken(newUser), cookieOptions)
+      .status(201)
+      .json(rest);
   } catch (err) {
     next(err);
   }

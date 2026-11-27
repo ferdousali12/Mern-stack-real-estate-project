@@ -1,3 +1,4 @@
+import { isValidObjectId } from "mongoose";
 import Listing from "../model/listing.model.js";
 import { errorHandler } from "../error.js";
 
@@ -94,6 +95,9 @@ const buildListingData = (data, userRef) => {
 const getOwnerId = (listing) =>
   typeof listing.userRef === "string" ? listing.userRef : listing.userRef?._id?.toString();
 
+const validateListingId = (id) =>
+  isValidObjectId(id) ? null : errorHandler(404, "Listing not found");
+
 export const createListing = async (req, res, next) => {
   try {
     const validationMessage = validateListing(req.body);
@@ -113,6 +117,9 @@ export const createListing = async (req, res, next) => {
 
 export const getListing = async (req, res, next) => {
   try {
+    const idError = validateListingId(req.params.id);
+    if (idError) return next(idError);
+
     const listing = await Listing.findById(req.params.id);
 
     if (!listing) {
@@ -200,6 +207,9 @@ export const getListings = async (req, res, next) => {
 
 export const updateListing = async (req, res, next) => {
   try {
+    const idError = validateListingId(req.params.id);
+    if (idError) return next(idError);
+
     const listing = await Listing.findById(req.params.id);
 
     if (!listing) {
@@ -217,9 +227,23 @@ export const updateListing = async (req, res, next) => {
       return next(errorHandler(400, validationMessage));
     }
 
+    const updateData = buildListingData(mergedData);
+    const unsetData = {};
+
+    if (
+      Object.prototype.hasOwnProperty.call(req.body, "discountPrice") &&
+      updateData.discountPrice === undefined
+    ) {
+      delete updateData.discountPrice;
+      unsetData.discountPrice = "";
+    }
+
     const updatedListing = await Listing.findByIdAndUpdate(
       req.params.id,
-      { $set: buildListingData(mergedData) },
+      {
+        $set: updateData,
+        ...(Object.keys(unsetData).length > 0 ? { $unset: unsetData } : {}),
+      },
       { new: true },
     );
 
@@ -231,6 +255,9 @@ export const updateListing = async (req, res, next) => {
 
 export const deleteListing = async (req, res, next) => {
   try {
+    const idError = validateListingId(req.params.id);
+    if (idError) return next(idError);
+
     const listing = await Listing.findById(req.params.id);
 
     if (!listing) {

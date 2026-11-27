@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useUser } from "../context/user-context.js";
 
 export const SignUp = () => {
   const navigate = useNavigate();
+  const { setUser } = useUser();
   const [formData, setFormData] = useState({});
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -36,7 +38,8 @@ export const SignUp = () => {
         throw new Error(data.message || "Sign up failed");
       }
 
-      navigate("/sign-in");
+      setUser(data);
+      navigate("/profile");
     } catch (err) {
       setError(err.message);
     } finally {
