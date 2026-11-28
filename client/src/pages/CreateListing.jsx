@@ -25,6 +25,8 @@ export const CreateListing = () => {
   const [loading, setLoading] = useState(Boolean(id));
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
+  const role = user?.role;
+  const canCreateSale = ["agent", "admin"].includes(role);
 
   useEffect(() => {
     if (!id) return;
@@ -227,28 +229,32 @@ export const CreateListing = () => {
         </div>
 
         <div className="flex gap-6">
-          <label className="flex items-center gap-2">
-            <input
-              type="radio"
-              name="type"
-              value="rent"
-              id="type"
-              checked={formData.type === "rent"}
-              onChange={handleChange}
-            />
-            Rent
-          </label>
-          <label className="flex items-center gap-2">
-            <input
-              type="radio"
-              name="type"
-              value="sale"
-              id="type"
-              checked={formData.type === "sale"}
-              onChange={handleChange}
-            />
-            Sale
-          </label>
+          {["owner", "agent", "admin"].includes(role) && (
+            <label className="flex items-center gap-2">
+              <input
+                type="radio"
+                name="type"
+                value="rent"
+                id="type"
+                checked={formData.type === "rent"}
+                onChange={handleChange}
+              />
+              Rent
+            </label>
+          )}
+          {canCreateSale && (
+            <label className="flex items-center gap-2">
+              <input
+                type="radio"
+                name="type"
+                value="sale"
+                id="type"
+                checked={formData.type === "sale"}
+                onChange={handleChange}
+              />
+              Sale
+            </label>
+          )}
         </div>
 
         <textarea

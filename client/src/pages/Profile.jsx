@@ -98,12 +98,14 @@ function ProfileForm({ user, onUpdate }) {
         {success && <p className="text-green-600">Profile updated.</p>}
       </form>
 
-      <Link
-        to="/create-listing"
-        className="block mt-7 text-center bg-slate-200 p-3 rounded-lg hover:bg-slate-300"
-      >
-        Create a listing
-      </Link>
+      {["admin", "agent", "owner"].includes(user.role) && (
+        <Link
+          to="/create-listing"
+          className="block mt-7 text-center bg-slate-200 p-3 rounded-lg hover:bg-slate-300"
+        >
+          Create a listing
+        </Link>
+      )}
     </>
   );
 }

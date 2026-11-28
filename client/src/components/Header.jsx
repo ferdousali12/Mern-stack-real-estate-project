@@ -76,6 +76,20 @@ export const Header = () => {
 
           {user ? (
             <>
+              {["admin", "agent", "owner"].includes(user.role) && (
+                <Link to="/create-listing">
+                  <li className="hidden sm:inline text-slate-700 hover:underline cursor-pointer">
+                    Create listing
+                  </li>
+                </Link>
+              )}
+              {user.role === "admin" && (
+                <Link to="/admin">
+                  <li className="hidden sm:inline text-slate-700 hover:underline cursor-pointer">
+                    Admin
+                  </li>
+                </Link>
+              )}
               <Link to="/profile">
                 <li className="text-slate-700 hover:underline cursor-pointer">
                   {user.username}

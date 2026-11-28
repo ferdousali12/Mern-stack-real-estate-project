@@ -60,6 +60,10 @@ export const signin = async (req, res, next) => {
       return next(errorHandler(404, "User not found!"));
     }
 
+    if (validUser.status === "disabled") {
+      return next(errorHandler(403, "Your account has been disabled"));
+    }
+
     const validPassword = bcrypt.compareSync(password, validUser.password);
 
     if (!validPassword) {
@@ -88,6 +92,10 @@ export const getMe = async (req, res, next) => {
 
     if (!user) {
       return next(errorHandler(404, "User not found"));
+    }
+
+    if (user.status === "disabled") {
+      return next(errorHandler(403, "Your account has been disabled"));
     }
 
     res.status(200).json(user);

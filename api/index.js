@@ -5,6 +5,8 @@ import cookieParser from "cookie-parser";
 import authrouter from "./routes/auth.route.js";
 import userrouter from "./routes/user.route.js";
 import listingrouter from "./routes/listing.route.js";
+import adminrouter from "./routes/admin.route.js";
+import User from "./model/user.model.js";
 
 const app = express();
 
@@ -13,7 +15,20 @@ app.use(cookieParser());
 
 mongoose
   .connect(process.env.MONGO_URI || "mongodb://127.0.0.1:27017/estate")
-  .then(() => console.log("Connected to estate DB!"))
+  .then(async () => {
+    console.log("Connected to estate DB!");
+
+    await Promise.all([
+      User.updateMany(
+        { role: { $exists: false } },
+        { $set: { role: "buyer" } },
+      ),
+      User.updateMany(
+        { status: { $exists: false } },
+        { $set: { status: "active" } },
+      ),
+    ]);
+  })
   .catch((err) => console.error("Connection error:", err));
 
 app.listen(3000, () => {
@@ -23,6 +38,7 @@ app.listen(3000, () => {
 app.use("/api/auth", authrouter);
 app.use("/api/user", userrouter);
 app.use("/api/listing", listingrouter);
+app.use("/api/admin", adminrouter);
 
 app.use((err, req, res, next) => {
   let statusCode = err.statusCode || 500;

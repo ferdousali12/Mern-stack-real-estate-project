@@ -91,6 +91,11 @@ export const Listing = () => {
       ? listing.userRef
       : listing.userRef?._id?.toString();
   const isOwner = user && ownerId === user._id;
+  const canManageListing =
+    user?.role === "admin" ||
+    (isOwner &&
+      ((user.role === "owner" && listing.type === "rent") ||
+        user.role === "agent"));
   const images = listing.images || [];
 
   return (
@@ -178,7 +183,7 @@ export const Listing = () => {
         </p>
       </div>
 
-      {isOwner && (
+      {canManageListing && (
         <div className="flex flex-wrap gap-3">
           <Link
             to={`/update-listing/${listing._id}`}

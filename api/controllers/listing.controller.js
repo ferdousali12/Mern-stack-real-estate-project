@@ -106,6 +106,31 @@ export const createListing = async (req, res, next) => {
       return next(errorHandler(400, validationMessage));
     }
 
+    if (
+      mergedData.type === "sale" &&
+      !["agent", "admin"].includes(req.authUser.role)
+    ) {
+      return next(errorHandler(403, "Only agents and admins can manage sale listings"));
+    }
+
+    if (
+      mergedData.type === "rent" &&
+      !["owner", "agent", "admin"].includes(req.authUser.role)
+    ) {
+      return next(errorHandler(403, "Only owners, agents, and admins can manage rent listings"));
+    }
+
+    const role = req.authUser.role;
+    const listingType = req.body.type;
+
+    if (listingType === "sale" && !["agent", "admin"].includes(role)) {
+      return next(errorHandler(403, "Only agents and admins can create sale listings"));
+    }
+
+    if (listingType === "rent" && !["owner", "agent", "admin"].includes(role)) {
+      return next(errorHandler(403, "Only owners, agents, and admins can create rent listings"));
+    }
+
     const listing = new Listing(buildListingData(req.body, req.user.id));
     await listing.save();
 
@@ -216,7 +241,7 @@ export const updateListing = async (req, res, next) => {
       return next(errorHandler(404, "Listing not found"));
     }
 
-    if (req.user.id !== getOwnerId(listing)) {
+    if (req.authUser.role !== "admin" && req.user.id !== getOwnerId(listing)) {
       return next(errorHandler(403, "You can only edit your own listings"));
     }
 
@@ -264,7 +289,11 @@ export const deleteListing = async (req, res, next) => {
       return next(errorHandler(404, "Listing not found"));
     }
 
-    if (req.user.id !== getOwnerId(listing)) {
+    if (req.authUser.role === "owner" && listing.type !== "rent") {
+      return next(errorHandler(403, "Owners can only manage rent listings"));
+    }
+
+    if (req.authUser.role !== "admin" && req.user.id !== getOwnerId(listing)) {
       return next(errorHandler(403, "You can only delete your own listings"));
     }
 
